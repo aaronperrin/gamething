@@ -1,0 +1,49 @@
+name: gamething-backend
+version: 0.1.0.0
+github: aaronperrin/gamething
+license: AllRightsReserved
+author: gamething contributors
+maintainer: none@example.com
+copyright: 2026 gamething contributors
+
+extra-source-files:
+- README.md
+
+language: GHC2021
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs: src
+  dependencies:
+  - base >= 4.17 && < 5
+  - containers >= 0.6 && < 0.8
+
+executables:
+  gamething-backend:
+    main: Main.hs
+    source-dirs: app
+    dependencies:
+    - base >= 4.17 && < 5
+    - gamething-backend
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+
+tests:
+  gamething-backend-test:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+    - base >= 4.17 && < 5
+    - containers >= 0.6 && < 0.8
+    - gamething-backend
