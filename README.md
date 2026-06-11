@@ -6,7 +6,7 @@ The project models bot-controlled players participating in an order-based market
 
 ## Current status
 
-This repository has been initialized with project instructions and architecture guidance for ChatGPT Codex and human contributors. The first implementation milestone is to build a small deterministic Haskell backend core and a plain HTML/CSS/JavaScript inspector frontend.
+This repository has been initialized with project instructions and architecture guidance for ChatGPT Codex and human contributors. The first implementation campaign is to build an executable deterministic Haskell backend core plus enough API/frontend surface to inspect the simulation loop.
 
 ## Non-negotiable requirements
 
@@ -29,7 +29,7 @@ This repository has been initialized with project instructions and architecture 
 │   ├── PROJECT_SPEC.md               # Product and simulation specification
 │   ├── ARCHITECTURE.md               # Architecture, boundaries, invariants
 │   ├── API.md                        # Initial HTTP API contract
-│   ├── CODEX_TASKS.md                # Ordered work packets for Codex
+│   ├── CODEX_TASKS.md                # Ambitious PR campaign backlog for Codex
 │   ├── TEST_PLAN.md                  # Required validation strategy
 │   └── decisions/
 │       └── 0001-architecture-principles.md
@@ -46,9 +46,9 @@ This repository has been initialized with project instructions and architecture 
     └── src/
 ```
 
-## First milestone
+## First implementation campaign
 
-Implement a deterministic vertical slice:
+Deliver a coherent deterministic vertical slice:
 
 1. Define core IDs, quantities, assets, players, orders, trades, events, and state.
 2. Seed a world with more than two bot players and Red/Yellow/Blue resource-source listings.
@@ -59,4 +59,12 @@ Implement a deterministic vertical slice:
 
 ## For Codex
 
-Start with `AGENTS.md`, then read `docs/PROJECT_SPEC.md`, `docs/ARCHITECTURE.md`, and `docs/CODEX_TASKS.md`. Do not begin large implementation changes before confirming the intended work packet and adding tests for the affected invariant.
+Start with `AGENTS.md`, then read `docs/PROJECT_SPEC.md`, `docs/ARCHITECTURE.md`, and `docs/CODEX_TASKS.md`.
+
+Codex should prefer ambitious, coherent PR campaigns with tests, docs, and stakeholder checkpoints. Do not block solely because external search is unavailable; use pinned repo versions or local tool output, and document assumptions when freshness cannot be verified.
+
+All documented local commands should be single-line Windows Command Prompt commands, for example:
+
+```cmd
+cd backend && stack test
+```
