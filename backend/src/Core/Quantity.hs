@@ -17,7 +17,7 @@ module Core.Quantity
   , renderQuantity
   ) where
 
-import Prelude hiding (subtract)
+import qualified Data.Ratio as Ratio
 
 newtype Quantity = Quantity Rational
   deriving stock (Eq, Ord)
@@ -29,7 +29,7 @@ quantity :: Integer -> Integer -> Maybe Quantity
 quantity n d
   | d <= 0 = Nothing
   | n < 0 = Nothing
-  | otherwise = Just (Quantity (n % d))
+  | otherwise = Just (Quantity (n Ratio.% d))
 
 zero :: Quantity
 zero = Quantity 0
@@ -47,10 +47,10 @@ fromParts n d =
     Nothing -> error "invalid non-negative quantity literal"
 
 numerator :: Quantity -> Integer
-numerator (Quantity value) = Data.Ratio.numerator value
+numerator (Quantity value) = Ratio.numerator value
 
 denominator :: Quantity -> Integer
-denominator (Quantity value) = Data.Ratio.denominator value
+denominator (Quantity value) = Ratio.denominator value
 
 add :: Quantity -> Quantity -> Quantity
 add (Quantity a) (Quantity b) = Quantity (a + b)
@@ -79,10 +79,3 @@ renderQuantity :: Quantity -> String
 renderQuantity q
   | denominator q == 1 = show (numerator q)
   | otherwise = show (numerator q) <> "/" <> show (denominator q)
-
-infixl 7 %
-
-(%) :: Integer -> Integer -> Rational
-(%) = (Data.Ratio.%)
-
-import qualified Data.Ratio
