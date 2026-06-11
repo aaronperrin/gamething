@@ -16,7 +16,6 @@ import Core.Types
   , ClockStatus (ClockRunning)
   , Config (..)
   , Controller (BotController)
-  , Inventory (..)
   , Market (..)
   , Order (..)
   , OrderId (..)
@@ -36,11 +35,6 @@ import Core.Types
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 
--- | Default config for the first deterministic foundation.
---
--- Stakeholder checkpoint: this intentionally seeds only bots, clocks, resource
--- sources, and market source listings. It does not yet assign owned sources or
--- implement behavior.
 defaultConfig :: Config
 defaultConfig =
   Config
@@ -59,9 +53,7 @@ seedState config =
     , statePlayers = seedPlayers config
     , stateMarket = seedMarket config
     , stateResourceSources = seedResourceSources config
-    , stateFactories = mempty
     , stateClocks = seedClocks config
-    , stateConnections = mempty
     , stateEvents = []
     , stateTerminal = False
     }
@@ -120,7 +112,6 @@ seedMarket config =
   let orders = seedSourceOrders config
    in Market
         { marketOrders = orders
-        , marketTrades = mempty
         , marketInventory = initialMarketInventory config
         , marketNextOrderId = OrderId (Map.size orders + 1)
         , marketNextTradeId = TradeId 1
