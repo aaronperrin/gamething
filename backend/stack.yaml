@@ -1,0 +1,8 @@
+# Resolver assumption for Campaign 1.
+# External freshness could not be verified in this environment, so this PR uses
+# a conservative Stack LTS resolver that should be replaced if local Windows
+# tooling indicates a better currently supported resolver.
+resolver: lts-22.43
+
+packages:
+- .
