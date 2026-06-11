@@ -1,0 +1,43 @@
+# macOS / editor noise
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Haskell / Stack
+.stack-work/
+backend/.stack-work/
+dist/
+dist-newstyle/
+*.hi
+*.o
+*.dyn_hi
+*.dyn_o
+*.prof
+*.aux
+*.hp
+*.eventlog
+
+# Haskell language tooling
+.hie-bios/
+hie.yaml
+
+# Frontend
+node_modules/
+coverage/
+
+# Build outputs
+build/
+out/
+tmp/
+
+# Environment
+.env
+.env.*
+!.env.example
