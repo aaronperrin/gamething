@@ -1,175 +1,199 @@
-# Codex Task Backlog
+# Codex PR Campaign Backlog
 
-Use this file as the ordered work queue for coding agents. Keep tasks small, testable, and reversible.
+Use this file as the ordered campaign queue for coding agents. Codex should prefer ambitious, coherent PRs that deliver complete vertical slices or major architectural layers.
 
-## Work packet protocol
+The goal is not tiny iteration. The goal is large, high-leverage implementation with tests, docs, and clear stakeholder checkpoints.
 
-For each work packet:
+## Campaign protocol
+
+For each campaign:
 
 1. Read `AGENTS.md` and relevant docs.
-2. State affected invariants.
-3. Add or update tests where feasible.
-4. Implement the smallest coherent change.
-5. Run formatters, type checks, and tests.
-6. Update this file when the packet is complete or split.
+2. State the PR goal, scope, assumptions, and affected invariants.
+3. Identify stakeholder checkpoints where review is especially valuable.
+4. Implement the full coherent slice, including tests and docs.
+5. Run formatters, type checks, and tests with single-line Windows Command Prompt commands.
+6. Update this file when the campaign is complete, split, or superseded.
 
-## Milestone 0: Repository scaffold
+## Local command policy
 
-Status: in progress.
+All command examples must be single-line Windows `cmd.exe` commands.
+
+Examples:
+
+```cmd
+cd backend && stack test
+```
+
+```cmd
+cd backend && stack build
+```
+
+Do not document Bash multiline commands or Unix line continuations.
+
+## Tooling and search policy
+
+Do not block a campaign solely because external search is unavailable.
+
+If dependency or resolver freshness cannot be verified externally:
+
+- prefer versions already pinned in the repository
+- otherwise use local tooling output when available
+- otherwise choose a conservative supported option and document it as an assumption
+- never invent version claims
+
+## Campaign 0: Repository scaffold
+
+Status: mostly complete.
 
 Goal: make the repository readable and safe for Codex.
 
-Tasks:
+Completed:
 
 - [x] Add top-level README.
 - [x] Add `AGENTS.md`.
 - [x] Add project specification document.
 - [x] Add architecture document.
 - [x] Add API contract document.
-- [ ] Add backend scaffold.
-- [ ] Add frontend scaffold.
-- [ ] Add initial Stack project configuration after verifying current supported resolver.
+- [x] Add backend scaffold directories.
+- [x] Add frontend scaffold directories.
+- [x] Add security, editor, and ignore files.
+
+Remaining:
+
+- [ ] Add initial Stack project configuration during Campaign 1.
 
 Acceptance criteria:
 
-- A new Codex session can identify the architecture, constraints, and first work packet without asking for context.
+- A new Codex session can identify the architecture, constraints, and first campaign without asking for context.
 
-## Milestone 1: Pure core skeleton
+Stakeholder checkpoint:
 
-Goal: define the domain model without implementing full behavior.
+- Confirm whether the repo guidance correctly encourages large, ambitious PRs with reviewable checkpoints.
 
-Tasks:
+## Campaign 1: Core simulation foundation
 
-- [ ] Create Stack Haskell project in `backend/`.
-- [ ] Define core identifier types.
-- [ ] Define exact `Quantity` type and document representation.
-- [ ] Define `ResourceType`, `PartType`, `ItemType`, `FactoryType`, `OperatorType`.
-- [ ] Define `Asset`.
-- [ ] Define `Order`, `Trade`, and `Market`.
-- [ ] Define `Player`, `Inventory`, `Wallet`, `BotMemory`.
-- [ ] Define `Clock`, `ResourceSource`, `Factory`, `Connection`.
-- [ ] Define `Event` alphabet.
-- [ ] Define `Choice` and `LegalChoices` shape.
-- [ ] Define `Config` and `State`.
+Goal: create an executable Stack backend and implement the pure domain model foundation.
+
+This should be one ambitious PR, not many tiny PRs.
+
+Scope:
+
+- Create Stack Haskell project in `backend/`.
+- Choose and document exact `Quantity` representation.
+- Define core identifier types.
+- Define `ResourceType`, `PartType`, `ItemType`, `FactoryType`, `OperatorType`.
+- Define `Asset`.
+- Define `Order`, `Trade`, and `Market`.
+- Define `Player`, `Inventory`, `Wallet`, `BotMemory`.
+- Define `Clock`, `ResourceSource`, `Factory`, `Connection`.
+- Define `Event` alphabet.
+- Define `Choice` and `LegalChoices` shape.
+- Define `Config` and `State`.
+- Add seed-world skeleton for more than two bot players.
+- Add tests for exact quantity arithmetic and deterministic initial state shape.
 
 Acceptance criteria:
 
-- Types compile.
+- `cd backend && stack build` succeeds.
+- `cd backend && stack test` succeeds.
 - No `IO` imports in `Core` modules except test-only modules.
 - Quantity tests prove exact addition/subtraction for values like `0.25`, `1.50`, and `3.00`.
+- Initial state contains `N > 2` bot players.
 
 Affected invariants:
 
-- I2, I3, I4, I7, I9.
+- I1, I2, I3, I4, I7, I9, I13.
 
-## Milestone 2: Deterministic seed world
+Stakeholder checkpoints:
 
-Goal: build an initial world with bot players and resource-source market listings.
+- Quantity representation before market/factory math depends on it.
+- Domain model shape before behavior expands.
 
-Tasks:
+## Campaign 2: Market, plugins, and deterministic seed economy
 
-- [ ] Implement deterministic seed config.
-- [ ] Ensure `N > 2` bot players.
-- [ ] Seed wallets.
-- [ ] Seed one simple clock per bot.
-- [ ] Seed Red/Yellow/Blue resource-source listings.
-- [ ] Seed basic part listings if needed for factory milestone.
-- [ ] Add deterministic ordering tests.
+Goal: implement the order-based market and seeded market plugins enough for bots and resources to interact.
+
+Scope:
+
+- Seed RedSource, YellowSource, and BlueSource listings.
+- Implement market plugin shape for basic resources, parts, and factories.
+- Implement order placement validation.
+- Implement bid/ask compatibility by asset.
+- Implement deterministic priority: best price, earliest created tick, lowest order id.
+- Implement resting-order clearing price.
+- Implement partial fills.
+- Emit `OrderPlaced`, `TradeExecuted`, `WalletCredited`, `WalletDebited`, and plugin listing events.
+- Add deterministic replay tests for matching and plugin listing order.
 
 Acceptance criteria:
 
-- Same seed/config creates byte-equivalent or structurally equivalent initial state.
+- Compatible bid/ask orders match.
+- Incompatible assets do not match.
+- Partial fills update remaining quantities.
+- Re-running the same market state gives the same trades in the same order.
 - Market starts with RedSource, YellowSource, and BlueSource listings.
 
 Affected invariants:
 
-- I1, I6, I7, I12, I13.
+- I4, I6, I7, I12.
 
-## Milestone 3: Market matching
+Stakeholder checkpoint:
 
-Goal: implement deterministic compatible order matching with partial fills.
+- Market clearing and plugin semantics before bots depend on them.
 
-Tasks:
+## Campaign 3: Legal choices, bot policies, clocks, and extraction
 
-- [ ] Implement order placement validation.
-- [ ] Implement bid/ask compatibility by asset.
-- [ ] Implement deterministic priority: best price, earliest created tick, lowest order id.
-- [ ] Implement resting-order clearing price.
-- [ ] Implement partial fills.
-- [ ] Emit `TradeExecuted`, `WalletCredited`, `WalletDebited`, and order status events.
+Goal: let bot players acquire resource sources, connect clocks, and extract exact fractional resources through legal choices only.
 
-Acceptance criteria:
+Scope:
 
-- Compatible bid/ask match.
-- Incompatible assets do not match.
-- Partial fills update remaining quantities.
-- Re-running the same market state gives the same trades in the same order.
-
-Affected invariants:
-
-- I4, I6, I7.
-
-## Milestone 4: Legal choices and bot policies
-
-Goal: ensure bots act only through legal choices.
-
-Tasks:
-
-- [ ] Implement `visibleState`.
-- [ ] Implement `legalChoices`.
-- [ ] Implement `applyChoice` with legality validation.
-- [ ] Implement `Wait` choice.
-- [ ] Implement initial `ResourceCollectorBot`.
-- [ ] Implement deterministic bot iteration order.
-- [ ] Emit `BotDecisionMade` and `NoOp` where appropriate.
+- Implement `visibleState`.
+- Implement `legalChoices`.
+- Implement `applyChoice` with legality validation.
+- Implement `Wait` choice.
+- Implement initial `ResourceCollectorBot`.
+- Implement deterministic bot iteration order.
+- Implement buying resource-source asset from market order.
+- Implement `ConnectClock` choice.
+- Implement explicit connection graph.
+- Implement clock tick behavior.
+- Implement resource extraction only through connected source.
+- Emit `BotDecisionMade`, `NoOp`, `ResourcePurchased`, `ResourceConnected`, and `ResourceExtracted`.
+- Add integration scenario for a bot buying, connecting, and extracting.
 
 Acceptance criteria:
 
 - Any bot choice applied during a tick is present in `LegalChoices`.
 - Illegal choices are rejected or ignored with explicit event/error semantics.
 - Same seed/config produces same bot decisions.
-
-Affected invariants:
-
-- I4, I13, I14, I17-style visibility constraints from spec.
-
-## Milestone 5: Clocks and resource extraction
-
-Goal: bots can buy resource sources, connect clocks, and extract fractional resources.
-
-Tasks:
-
-- [ ] Implement buying resource-source asset from market order.
-- [ ] Implement `ConnectClock` choice.
-- [ ] Implement explicit connection graph.
-- [ ] Implement clock tick behavior.
-- [ ] Implement resource extraction only through connected source.
-- [ ] Emit `ResourcePurchased`, `ResourceConnected`, and `ResourceExtracted`.
-
-Acceptance criteria:
-
 - A connected clock extracts exactly `0.25` resource units per tick for the default source.
 - Unconnected resource sources do not extract.
-- Extraction is deterministic and exact.
 
 Affected invariants:
 
-- I4, I7, I8.
+- I4, I7, I8, I13, I14.
 
-## Milestone 6: Factories and fungible items
+Stakeholder checkpoint:
 
-Goal: build and run factories that produce fungible items.
+- Bot visible-state and legal-choice model before smarter bot policies are added.
 
-Tasks:
+## Campaign 4: Factories, fungible items, and production loop
 
-- [ ] Define initial factory recipes.
-- [ ] Implement `CanBuildFactory`.
-- [ ] Implement `BuildFactory` choice.
-- [ ] Support `buildTicks = 0` while preserving delayed-build model.
-- [ ] Implement factory production.
-- [ ] Consume input resources per output.
-- [ ] Merge fungible balances by item type.
-- [ ] Emit `FactoryBuildStarted`, `FactoryBuilt`, and `FactoryProduced`.
+Goal: complete the first production economy loop from extracted resources to fungible items.
+
+Scope:
+
+- Define initial factory recipes.
+- Implement `CanBuildFactory`.
+- Implement `BuildFactory` choice.
+- Support `buildTicks = 0` while preserving delayed-build model.
+- Implement factory production.
+- Consume input resources per output.
+- Merge fungible balances by item type.
+- Add simple sell-order behavior for produced items.
+- Emit `FactoryBuildStarted`, `FactoryBuilt`, `FactoryProduced`, `ItemListed`, and `ItemSold` where applicable.
+- Add integration scenario for `OrangeMixer` or equivalent first factory.
 
 Acceptance criteria:
 
@@ -177,29 +201,37 @@ Acceptance criteria:
 - Factory production consumes input resources and creates item quantity.
 - Same item type balances merge.
 - No item can appear unless factory-produced or seeded in a test fixture.
+- Produced items can be listed into the market.
 
 Affected invariants:
 
 - I9, I10, I11.
 
-## Milestone 7: Server API
+Stakeholder checkpoint:
 
-Goal: expose the pure core through an HTTP backend.
+- Factory recipe and item semantics before expanding content.
 
-Tasks:
+## Campaign 5: Server API and in-memory app shell
 
-- [ ] Add minimal server dependencies after Stack resolver is chosen.
-- [ ] Define `AppEnv`.
-- [ ] Implement in-memory persistence service.
-- [ ] Implement `/api/state`.
-- [ ] Implement `/api/tick`.
-- [ ] Implement `/api/reset`.
-- [ ] Implement `/api/market`, `/api/players`, `/api/events`.
-- [ ] Implement `/api/run` with bounded tick count.
+Goal: expose the pure core through a local Haskell HTTP backend suitable for the inspector frontend.
+
+Scope:
+
+- Add minimal server dependencies.
+- Define `AppEnv`.
+- Implement in-memory persistence service.
+- Implement safe JSON serialization for quantities.
+- Implement `/api/state`.
+- Implement `/api/tick`.
+- Implement `/api/reset`.
+- Implement `/api/market`, `/api/players`, `/api/events`.
+- Implement `/api/run` with bounded tick count.
+- Add API tests where practical.
 
 Acceptance criteria:
 
-- Server starts locally.
+- `cd backend && stack build` succeeds.
+- Server starts locally with a documented single-line Windows command.
 - API responses serialize quantities safely.
 - Tick and reset endpoints mutate state only through core transitions.
 
@@ -207,45 +239,61 @@ Affected invariants:
 
 - I2, I4, I5.
 
-## Milestone 8: Frontend inspector
+Stakeholder checkpoint:
+
+- API response shape before frontend code depends on it.
+
+## Campaign 6: Frontend inspector
 
 Goal: provide a plain browser UI for observing and controlling the simulation.
 
-Tasks:
+Scope:
 
-- [ ] Create `frontend/index.html`.
-- [ ] Create `frontend/styles.css`.
-- [ ] Create `frontend/src/api.js`.
-- [ ] Create `frontend/src/render.js`.
-- [ ] Create `frontend/src/controls.js`.
-- [ ] Create `frontend/src/state.js`.
-- [ ] Render current tick, bots, inventories, resources, clocks, factories, market orders, trades, events, and metrics.
-- [ ] Add controls for reset, step one tick, run N ticks, and pause run.
+- Create `frontend/index.html`.
+- Create `frontend/styles.css`.
+- Create `frontend/src/api.js`.
+- Create `frontend/src/render.js`.
+- Create `frontend/src/controls.js`.
+- Create `frontend/src/state.js`.
+- Render current tick, bots, inventories, resources, clocks, factories, market orders, trades, events, and metrics.
+- Add controls for reset, step one tick, run N ticks, and pause run.
+- Add minimal smoke tests or manual verification notes.
 
 Acceptance criteria:
 
 - UI can inspect state and manually step ticks.
 - UI does not contain authoritative simulation rules.
+- Commands and run instructions are Windows Command Prompt single-line commands.
 
-## Milestone 9: Metrics and debugging
+Stakeholder checkpoint:
 
-Goal: make emergent behavior observable.
+- Frontend information architecture before the inspector grows wider.
 
-Tasks:
+## Campaign 7: Metrics and debugging visibility
 
-- [ ] Track market volume by asset.
-- [ ] Track average price by asset.
-- [ ] Track bid/ask spread.
-- [ ] Track unsold inventory.
-- [ ] Track bot wallet value.
-- [ ] Track bot resource balances.
-- [ ] Track factory utilization.
-- [ ] Track resource extraction per tick.
-- [ ] Track item production per tick.
-- [ ] Track trades per tick.
-- [ ] Track order fill time.
+Goal: make emergent behavior observable enough to guide product decisions.
+
+Scope:
+
+- Track market volume by asset.
+- Track average price by asset.
+- Track bid/ask spread.
+- Track unsold inventory.
+- Track bot wallet value.
+- Track bot resource balances.
+- Track factory utilization.
+- Track resource extraction per tick.
+- Track item production per tick.
+- Track trades per tick.
+- Track order fill time.
+- Show metrics in API and frontend.
 
 Acceptance criteria:
 
-- Inspector can explain why bots are gaining/losing value.
+- Inspector can explain why bots are gaining or losing value.
 - Simulation logs are sufficient to debug a surprising trade or production event.
+- Metrics are deterministic for a given state sequence.
+
+Stakeholder checkpoint:
+
+- Metrics usefulness for evaluating whether interesting economic behavior is emerging.
