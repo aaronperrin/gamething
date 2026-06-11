@@ -8,57 +8,37 @@ The backend owns all authoritative simulation state and rules. The core must rem
 
 ## Intended structure
 
-```text
-backend/
-  app/
-    Main.hs
-  src/
-    Core/
-      Types.hs
-      Quantity.hs
-      Tick.hs
-      Market.hs
-      Operators.hs
-      Resources.hs
-      Factories.hs
-      Bots.hs
-      Simulation.hs
-      Visibility.hs
-      LegalChoices.hs
-      Events.hs
-      Seed.hs
-    Server/
-      Api.hs
-      Handlers.hs
-      AppEnv.hs
-      Json.hs
-    Infrastructure/
-      Random.hs
-      Logging.hs
-      Persistence.hs
-      Time.hs
-      Config.hs
-  test/
-  stack.yaml
-  package.yaml
-```
+backend/app/Main.hs
+backend/src/Core
+backend/src/Server
+backend/src/Infrastructure
+backend/test
+backend/stack.yaml
+backend/package.yaml
 
 ## Core rule
 
-`Core` modules should be importable and testable without starting a server or touching `IO`.
+Core modules should be importable and testable without starting a server or touching IO.
 
-Preferred shape:
+Preferred pure functions:
 
-```haskell
 stepSimulation :: Config -> State -> BotChoices -> State
+
 tick :: Config -> State -> State
-```
 
 ## Stack setup note
 
-Do not guess the resolver. Before creating `stack.yaml`, verify the latest stable GHC resolver supported by Stack in the implementation environment. Then document the resolver choice in this README.
+Use Stack for the backend workflow. Prefer a stable resolver that works on the local Windows 11 development machine. If the newest resolver cannot be confirmed from local tooling, choose a conservative supported resolver and document that assumption.
 
-## First backend tasks
+## Windows commands
+
+Document local commands as single-line Windows Command Prompt examples.
+
+Example: cd backend && stack build
+
+Example: cd backend && stack test
+
+## First backend campaign
 
 1. Initialize Stack project.
 2. Define exact quantity representation.
